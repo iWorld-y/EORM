@@ -1,6 +1,7 @@
 package EugeneORM
 
 import (
+	"EugeneORM/dialect"
 	"EugeneORM/log"
 	"EugeneORM/session"
 	"database/sql"
@@ -8,10 +9,11 @@ import (
 
 // Engine 负责连接/测试数据库等前期准备工作, 以及关闭连接等后期收尾工作
 type Engine struct {
-	db *sql.DB
+	db      *sql.DB
+	dialect dialect.Dialect
 }
 
-// NewEngine 返回一个 Engine 对象, 并测试数据库连接
+// NewEngine 创建 Engine 实例时，获取 driver 对应的 dialect, 并测试数据库连接
 func NewEngine(driver, source string) (e *Engine, err error) {
 	db, err := sql.Open(driver, source)
 	if err != nil {
@@ -24,7 +26,14 @@ func NewEngine(driver, source string) (e *Engine, err error) {
 		log.Error(err)
 		return nil, err
 	}
-	e = &Engine{db: db}
+
+	// 确保指定的 dialect 存在
+	dial, ok := dialect.GetDialect(driver)
+	if !ok {
+		log.Errorf("方言 %s 不存在\n", driver)
+	}
+
+	e = &Engine{db: db, dialect: dial}
 	log.Info("数据库连接成功")
 	return e, nil
 }
@@ -40,5 +49,5 @@ func (engine *Engine) Close() {
 // NewSession 使用 engine.db 创建一个 Session 对象
 // 即创建一个会话, 以便于数据库交互
 func (engine *Engine) NewSession() *session.Session {
-	return session.New(engine.db)
+	return session.New(engine.db, engine.dialect)
 }

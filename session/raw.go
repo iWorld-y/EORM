@@ -1,21 +1,27 @@
 package session
 
 import (
+	"EugeneORM/dialect"
 	"EugeneORM/log"
+	"EugeneORM/schema"
 	"database/sql"
 	"strings"
 )
 
 // Session 负责与数据库的交互
 type Session struct {
-	db      *sql.DB         // 使用 sql.Open() 方法连接数据库成功后返回的指针
-	sql     strings.Builder // 用于拼接 SQL 语句及其中的占位符
-	sqlVars []interface{}   // 占位符所对应的数据
+	db       *sql.DB         // 使用 sql.Open() 方法连接数据库成功后返回的指针
+	dialect  dialect.Dialect // 所使用的数据库方言
+	refTable *schema.Schema  // 需要读写的数据表
+	sql      strings.Builder // 用于拼接 SQL 语句及其中的占位符
+	sqlVars  []interface{}   // 占位符所对应的数据
 }
 
 // New 创建一个新的 Session 对象，接受一个 *sql.DB 指针作为参数，并返回该对象的指针
-func New(db *sql.DB) *Session {
-	return &Session{db: db}
+func New(db *sql.DB, dialect dialect.Dialect) *Session {
+	return &Session{db: db,
+		dialect: dialect,
+	}
 }
 
 // Clear 重置 Session 对象的 sql 字段和 sqlVars 字段
