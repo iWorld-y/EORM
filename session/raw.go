@@ -1,0 +1,67 @@
+package session
+
+import (
+	"EugeneORM/log"
+	"database/sql"
+	"strings"
+)
+
+// Session 负责与数据库的交互
+type Session struct {
+	db      *sql.DB         // 使用 sql.Open() 方法连接数据库成功后返回的指针
+	sql     strings.Builder // 用于拼接 SQL 语句及其中的占位符
+	sqlVars []interface{}   // 占位符所对应的数据
+}
+
+// New 创建一个新的 Session 对象，接受一个 *sql.DB 指针作为参数，并返回该对象的指针
+func New(db *sql.DB) *Session {
+	return &Session{db: db}
+}
+
+// Clear 重置 Session 对象的 sql 字段和 sqlVars 字段
+func (s *Session) Clear() {
+	s.sql.Reset()
+	s.sqlVars = nil
+}
+
+// DB 返回 Session 对象的 db 字段，即 *sql.DB 指针
+func (s *Session) DB() *sql.DB {
+	return s.db
+}
+
+// Raw 拼接 SQL 语句和其中的占位符，并将占位符对应的数据存储在 sqlVars 中
+// 接受一个 sql 字符串作为参数，并可以接受任意数量的占位符所对应的数据
+// 返回 Session 对象的指针，以支持链式调用
+func (s *Session) Raw(sql string, values ...interface{}) *Session {
+	s.sql.WriteString(sql)
+	s.sql.WriteString(" ")
+	s.sqlVars = append(s.sqlVars, values...)
+	return s
+}
+
+// Exec 使用 sqlVars 执行原始 SQL
+func (s *Session) Exec() (result sql.Result, err error) {
+	defer s.Clear()
+	log.Info(s.sql.String(), s.sqlVars)
+	if result, err = s.DB().Exec(s.sql.String(), s.sqlVars...); err != nil {
+		log.Error(err)
+	}
+	return
+}
+
+// QueryRow 从数据库读取一条记录
+func (s *Session) QueryRow() *sql.Row {
+	defer s.Clear()
+	log.Info(s.sql.String(), s.sqlVars)
+	return s.DB().QueryRow(s.sql.String(), s.sqlVars...)
+}
+
+// QueryRows 从数据库读取一组数据
+func (s *Session) QueryRows() (rows *sql.Rows, err error) {
+	defer s.Clear()
+	log.Info(s.sql.String(), s.sqlVars)
+	if rows, err = s.DB().Query(s.sql.String(), s.sqlVars...); err != nil {
+		log.Error(err)
+	}
+	return rows, err
+}
