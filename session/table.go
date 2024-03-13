@@ -1,4 +1,4 @@
-// 操作数据库表
+// Package session 操作数据库表
 package session
 
 import (

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	engine, _ := EugeneORM.NewEngine("sqlite3", "gee.db")
+	engine, _ := EugeneORM.NewEngine("sqlite3", "EugeneORMTest.db")
 	defer engine.Close()
 	s := engine.NewSession()
 	_, _ = s.Raw("DROP TABLE IF EXISTS User;").Exec()
