@@ -1,6 +1,7 @@
 package session
 
 import (
+	"EugeneORM/clause"
 	"EugeneORM/dialect"
 	"EugeneORM/log"
 	"EugeneORM/schema"
@@ -13,6 +14,7 @@ type Session struct {
 	db       *sql.DB         // 使用 sql.Open() 方法连接数据库成功后返回的指针
 	dialect  dialect.Dialect // 所使用的数据库方言
 	refTable *schema.Schema  // 需要读写的数据表
+	clause   clause.Clause   // 指定操作 + 对应数据 生成的子句
 	sql      strings.Builder // 用于拼接 SQL 语句及其中的占位符
 	sqlVars  []interface{}   // 占位符所对应的数据
 }
@@ -24,10 +26,11 @@ func New(db *sql.DB, dialect dialect.Dialect) *Session {
 	}
 }
 
-// Clear 重置 Session 对象的 sql 字段和 sqlVars 字段
+// Clear 重置 Session 对象的 sql 字段, sqlVars 字段和子句字段
 func (s *Session) Clear() {
 	s.sql.Reset()
 	s.sqlVars = nil
+	s.clause = clause.Clause{}
 }
 
 // DB 返回 Session 对象的 db 字段，即 *sql.DB 指针

@@ -9,12 +9,15 @@ import (
 	"strings"
 )
 
-// Model 若当前 Session 的数据表为空, 或者传入的是新类型的对象
-// 则更新数据表 refTable
-// 这样做是因为解析操作比较费时, 所以若传入的结构体未发生变化就不更新 refTable
+// Model 根据传入的对象决定是否要生成数据表 refTable
 func (s *Session) Model(value interface{}) *Session {
 	if s.refTable == nil ||
 		reflect.TypeOf(value) != reflect.TypeOf(s.refTable.Model) {
+		// 若当前 session 的数据表为空
+		// 或者传入对象的类型与当前 session 的数据表对应对象的类型不一致
+		// 即传入的结构体发生了变化
+		// 则更新数据表 refTable
+		// 这样做是因为解析操作比较费时, 所以若传入的结构体未发生变化就不更新 refTable
 		s.refTable = schema.Parse(value, s.dialect)
 	}
 	return s

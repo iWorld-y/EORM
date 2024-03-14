@@ -59,3 +59,12 @@ func Parse(dest interface{}, d dialect.Dialect) *Schema {
 
 	return schema // 返回解析得到的 Schema 实例
 }
+
+// RecordValues 用于生成一系列对象值的数组, 比如 {("张三", 18), ("李四", 24)}
+func (schema *Schema) RecordValues(dest interface{}) (fieldValues []interface{}) {
+	destValue := reflect.Indirect(reflect.ValueOf(dest))
+	for _, field := range schema.Fields {
+		fieldValues = append(fieldValues, destValue.FieldByName(field.Name).Interface())
+	}
+	return fieldValues
+}
