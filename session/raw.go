@@ -1,10 +1,10 @@
 package session
 
 import (
-	"EugeneORM/clause"
-	"EugeneORM/dialect"
-	"EugeneORM/log"
-	"EugeneORM/schema"
+	"EORM/clause"
+	"EORM/dialect"
+	"EORM/log"
+	"EORM/schema"
 	"database/sql"
 	"strings"
 )

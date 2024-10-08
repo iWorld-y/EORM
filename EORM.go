@@ -1,9 +1,9 @@
-package EugeneORM
+package EORM
 
 import (
-	"EugeneORM/dialect"
-	"EugeneORM/log"
-	"EugeneORM/session"
+	"EORM/dialect"
+	"EORM/log"
+	"EORM/session"
 	"database/sql"
 )
 

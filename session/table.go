@@ -2,8 +2,8 @@
 package session
 
 import (
-	"EugeneORM/log"
-	"EugeneORM/schema"
+	"EORM/log"
+	"EORM/schema"
 	"fmt"
 	"reflect"
 	"strings"

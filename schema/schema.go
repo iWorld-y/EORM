@@ -1,7 +1,7 @@
 package schema
 
 import (
-	"EugeneORM/dialect"
+	"EORM/dialect"
 	"go/ast"
 	"reflect"
 )
@@ -48,7 +48,7 @@ func Parse(dest interface{}, d dialect.Dialect) *Schema {
 				Type: d.DataTypeOf(reflect.Indirect(reflect.New(p.Type))), // 利用 dialect.Dialect 接口获取字段的数据类型
 			}
 
-			if v, ok := p.Tag.Lookup("EugeneORM"); ok { // 如果字段有 "EugeneORM" 标签，将其值赋给 Field 结构体的 Tag 字段
+			if v, ok := p.Tag.Lookup("EORM"); ok { // 如果字段有 "EORM" 标签，将其值赋给 Field 结构体的 Tag 字段
 				field.Tag = v
 			}
 			schema.Fields = append(schema.Fields, field)          // 将字段添加到 Schema 的字段列表中

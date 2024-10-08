@@ -1,13 +1,13 @@
 package schema
 
 import (
-	"EugeneORM/dialect"
+	"EORM/dialect"
 	"testing"
 )
 
 // schema_test.go
 type User struct {
-	Name string `EugeneORM:"PRIMARY KEY"`
+	Name string `EORM:"PRIMARY KEY"`
 	Age  int
 }
 
