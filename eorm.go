@@ -2,6 +2,7 @@ package EORM
 
 import (
 	"EORM/log"
+	"EORM/session"
 	"database/sql"
 )
 
@@ -31,4 +32,7 @@ func (e *Engine) Close() {
 		log.Error("数据库关闭失败")
 	}
 	log.Info("数据库已关闭")
+}
+func (e *Engine) NewSession() *session.Session {
+	return session.New(e.db)
 }
