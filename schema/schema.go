@@ -25,6 +25,8 @@ type Schema struct {
 func (s *Schema) GetField(name string) *Field {
 	return s.fieldMap[name]
 }
+
+// Parse 将传入的对象解析为数据表
 func Parse(model interface{}, dialect dialect.Dialect) *Schema {
 	modelType := reflect.Indirect(reflect.ValueOf(model)).Type()
 	schema := &Schema{

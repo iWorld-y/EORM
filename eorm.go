@@ -1,13 +1,15 @@
 package EORM
 
 import (
+	"EORM/dialect"
 	"EORM/log"
 	"EORM/session"
 	"database/sql"
 )
 
 type Engine struct {
-	db *sql.DB
+	db      *sql.DB
+	dialect dialect.Dialect
 }
 
 // NewEngine 连接数据库, 并且通过 ping 测试连接
@@ -23,6 +25,13 @@ func NewEngine(driver, source string) (*Engine, error) {
 		log.Error(err)
 		return nil, err
 	}
+
+	dial, ok := dialect.GetDialect(driver)
+	if !ok {
+		log.Errorf("dialect %s 获取失败", driver)
+		return nil, err
+	}
+	engine.dialect = dial
 	log.Info("数据库已连接")
 	return engine, nil
 }
@@ -34,5 +43,5 @@ func (e *Engine) Close() {
 	log.Info("数据库已关闭")
 }
 func (e *Engine) NewSession() *session.Session {
-	return session.New(e.db)
+	return session.New(e.db, e.dialect)
 }

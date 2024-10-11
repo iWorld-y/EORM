@@ -1,9 +1,11 @@
 package session
 
 import (
+	"EORM/dialect"
 	"EORM/log"
 	"EORM/utils"
 	"database/sql"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -16,7 +18,13 @@ func newSession(t *testing.T) *Session {
 		log.Error(err)
 		t.Fatal(err)
 	}
-	return New(testDB)
+	testDial, ok := dialect.GetDialect(utils.SqliteDBDriverName)
+	if !ok {
+		err = errors.New("get dialect failed")
+		log.Error(err)
+		t.Fatal(err)
+	}
+	return New(testDB, testDial)
 }
 func TestSession_Exec(t *testing.T) {
 	session := newSession(t)
@@ -38,5 +46,42 @@ func TestSession_QueryRows(t *testing.T) {
 	cnt := 0
 	if err := row.Scan(&cnt); err != nil || cnt == 0 {
 		t.Fatal("failed ", err)
+	}
+}
+
+type Account struct {
+	Id   int64  `EORM:"PRIMARY KEY"`
+	Name string `EORM:""`
+}
+
+func TestSession_CreateTable(t *testing.T) {
+	log.SetLevel(log.InfoLevel)
+	session := newSession(t).Model(&Account{})
+	if err := session.DropTable(); err != nil {
+		t.Fatal(err)
+	}
+	if err := session.CreateTable(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSession_HasTable(t *testing.T) {
+	log.SetLevel(log.InfoLevel)
+	session := newSession(t).Model(&Account{})
+	_ = session.CreateTable()
+	if !session.HasTable() {
+		err := errors.New("expect true, bug false")
+		log.Error(err)
+		t.Fatal(err)
+	}
+	err := session.DropTable()
+	for session.HasTable() || err != nil {
+		if err == nil {
+			err = errors.New("expect false, bug true")
+		} else if errors.Is(err, sql.ErrNoRows) {
+			break
+		}
+		log.Error(err)
+		t.Fatal(err)
 	}
 }

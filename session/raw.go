@@ -1,7 +1,9 @@
 package session
 
 import (
+	"EORM/dialect"
 	"EORM/log"
+	"EORM/schema"
 	"database/sql"
 	"strings"
 )
@@ -10,10 +12,13 @@ type Session struct {
 	db      *sql.DB
 	sql     strings.Builder
 	sqlVals []interface{}
+
+	dialect  dialect.Dialect // 当前会话使用的方言
+	refTable *schema.Schema  // 当前会话操作的数据表
 }
 
-func New(db *sql.DB) *Session {
-	return &Session{db: db}
+func New(db *sql.DB, dial dialect.Dialect) *Session {
+	return &Session{db: db, dialect: dial}
 }
 
 func (s *Session) Clear() {
